@@ -1,25 +1,18 @@
+
+
 import csv
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-##mex_19.to_csv(r'MexiFront_sinIndex_2019.csv', index = False)
-
+#Creacion de dataframe principal
 front =  pd.read_csv("fronteras.csv")
 border = front['Border'] == 'US-Canada Border'
 fecha = front['Date'].isin(['1/1/2019 00:00','2/1/2019 00:00','3/1/2019 00:00','4/1/2019 00:00','5/1/2019 00:00','6/1/2019 00:00','7/1/2019 00:00','8/1/2019 00:00','9/1/2019 00:00','10/1/2019 00:00','11/1/2019 00:00','12/1/2019 00:00'])
 frontDT = front[border & fecha]
-
 df = frontDT.drop(frontDT.columns.difference(['State', 'Port Name', 'Measure', 'Value', 'Date']),1)
 dff = df[df.State != 'AK']
 dff['Date'] =  pd.to_datetime(dff['Date'], format='%m/%d/%Y %H:%M')
-#estado = dff.groupby('State').count()
 
-'''
-id = dff[dff.State == 'ID']
-idG = id.groupby('Date').sum()
-idG.plot()
-plt.show()
-'''
 
 #Pregunta 1
 def grafica_estados(state1, code):
@@ -82,79 +75,32 @@ def grafica_estados(state1, code):
     state = dff[dff.State == code]
     stateV = state[state.Measure == 'Personal Vehicles']
     stateP = state[state.Measure == 'Personal Vehicle Passengers']
-    print(stateV)
-    print(stateP)
-    stateTot = stateV.append(stateP(stateP['Measure'], stateP['Value']))
-    print('\n\n\n', stateTot)
-    idG = state.groupby(['Port Name' ,'Measure'],as_index=False).sum()
-    print(idG)
-    print(type(idG))
-    idG.plot.bar(x= 'Port Name')
+    JuntosAK= pd.merge(stateP,stateV, on='Port Name') 
+    dfJuntosAK=pd.DataFrame(JuntosAK) 
+    dfJuntosAK = dfJuntosAK.groupby('Port Name', as_index=False).sum()
+    JuntosAKx = dfJuntosAK[['Port Name','Value_x','Value_y']]
+    #print(JuntosAKx)
+    JuntosAKx.plot.bar(x= 'Port Name')
     plt.title(state1 , fontdict=None, loc='center', pad=None)
     plt.show()
 
+
 print('A continuacion se imprimiran las graficas de Personal Vehicles\n\n\n\n')
-#grafica_estados('Idaho', 'ID')
+grafica_estados('Idaho', 'ID')
 grafica_estados('Maine', 'ME')
-'''grafica_estados('Michigan', 'MI')
+grafica_estados('Michigan', 'MI')
 grafica_estados('Minnesota', 'MN')
 grafica_estados('Montana', 'MT')
 grafica_estados('North_Dakota', 'ND')
 grafica_estados('New_York', 'NY')
-grafica_estados('Ohio', 'OH')
 grafica_estados('Vermont', 'VT')
-grafica_estados('Washington', 'WA')'''
+grafica_estados('Washington', 'WA')
+
 
 #Pregunta 4
-def hist_estados(state1, code):
-    print('A continuacion se imprimira la grafica de '+ state1 + '\n')
-    state = dff[dff.State == code]
-    state = state[state.Measure == 'Bus Passengers']
-    idG = state.groupby('Port Name').sum()
-    plt.hist(idG['Value'])
-    print(idG)
-    plt.title(state1 , fontdict=None, loc='center', pad=None)
-    plt.show()
-
-print('A continuacion se imprimiran las graficas de Personal Vehicles\n\n\n\n')
-hist_estados('Idaho', 'ID')
-hist_estados('Maine', 'ME')
-hist_estados('Michigan', 'MI')
-hist_estados('Minnesota', 'MN')
-hist_estados('Montana', 'MT')
-hist_estados('North_Dakota', 'ND')
-hist_estados('New_York', 'NY')
-hist_estados('Ohio', 'OH')
-hist_estados('Vermont', 'VT')
-hist_estados('Washington', 'WA')
-'''
-#fechas = (['1/1/2019','2/1/2019','3/1/2019','4/1/2019','5/1/2019','6/1/2019','7/1/2019','8/1/2019','9/1/2019','10/1/2019','11/1/2019','12/1/2019'])
-
-def grafica_estados(state1, code):
-    print('A continuacion se imprimira la grafica de '+ state1 + '\n\n')
-    state = dff['State'] == code
-    state = state['Measure'].isin(['Personal Vehicles','Personal Vehicles Passengers'])
-    print(state)
-    idG = state.groupby(['Measure', 'Port Name']).sum()
-    print(idG)
-    idG.plot.bar(x='Port Name')
-    plt.title(state1 , fontdict=None, loc='center', pad=None)
-    plt.show()
+state = dff[dff.Measure == 'Bus Passengers']
+state.hist()
+plt.title('Histograma de Bus Passengers' , fontdict=None, loc='center', pad=None)
+plt.show()
 
 
-
-
-#Pregunta 3
-def grafica_estados(state1, code):
-    print('A continuacion se imprimira la grafica de '+ state1 + '\n\n')
-    state = dff[dff.State == code]
-    state = state[(state.Measure == 'Personal Vehicles') | (state.Measure == 'Personal Vehicle Passengers')]
-    print(state)
-    idG = state.groupby(['Port Name' ,'Measure'],as_index=False).sum()
-    print(idG)
-    print(type(idG))
-    idG.plot.bar(x= 'Port Name')
-    plt.title(state1 , fontdict=None, loc='center', pad=None)
-    plt.show()
-
-'''
